@@ -5,7 +5,7 @@ import { NavLink } from "react-router-dom";
 import * as sessionActions from '../../store/session';
 // import UpdateSpot from "../UpdateSpot";
 import {thunkLoadSpotsByUser} from '../../store/allSpots'
-
+import './Navigation.css'
 function ProfileButton({ user }) {
   const dispatch = useDispatch();
   const [showMenu, setShowMenu] = useState(false);
@@ -32,15 +32,7 @@ function ProfileButton({ user }) {
     dispatch(sessionActions.logout());
   };
 
-
-
-  return (
-    <>
-      <button onClick={openMenu}>
-        <i className="fas fa-user-circle" />
-      </button>
-      {showMenu && (
-        <ul className="profile-dropdown">
+{/* <ul className="profile-dropdown">
           <li>{user.username}</li>
           <li>{user.email}</li>
           <li>
@@ -51,8 +43,30 @@ function ProfileButton({ user }) {
           <li>
             <button onClick={logout}>Log Out</button>
           </li>
-        </ul>
+        </ul> */}
+
+  return (
+    <>
+    <div id='top-nav-buttons'>
+
+      <button className='chimney' onClick={openMenu}>
+        <i class="fa-solid fa-house-chimney-user" />
+      </button>
+      {showMenu && (
+        <div className="profile-dropdown">
+          <li>{user.username}</li>
+          <li>{user.email}</li>
+          <li>
+          <NavLink to='/my-spots/current'>
+            <button > Manage your spots</button>
+          </NavLink>
+          </li>
+          <li>
+            <button onClick={logout}>Log Out</button>
+          </li>
+        </div>
       )}
+    </div>
     </>
   );
 }

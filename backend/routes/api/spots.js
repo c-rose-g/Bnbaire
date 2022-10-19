@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { requireAuth } = require('../../utils/auth');
-const {Op}  = require('sequelize');
+const { Op } = require('sequelize');
 const {
 	Spot,
 	Review,
@@ -9,7 +9,7 @@ const {
 	User,
 	Booking,
 	ReviewImage,
-	sequelize
+	sequelize,
 } = require('../../db/models');
 
 // const { check } = require('express-validator');
@@ -90,41 +90,47 @@ router.post('/:spotId/bookings', requireAuth, async (req, res) => {
 	const spotBooking = await Booking.findOne({
 		where: {
 			spotId: spot.id,
-			[Op.or]: [
-				{
-					startDate: {
-						[Op.between]: [startDate, endDate],
-					},
-					endDate: {
-						[Op.between]: [startDate, endDate],
-					},
+			[Op.or]:[{
+				startDate:{
+					[Op.between]:[startDate,endDate]
 				},
-			],
+				endDate:{
+					[Op.between]:[startDate, endDate]
+				}
+			}]
 		},
 	});
-	// booking conflict
-	// (spotBooking.startDate >= startDate && spotBooking.endDate <= endDate) ||
-	// (spotBooking.startDate <= startDate && spotBooking.endDate >= endDate)
-	if (spotBooking && spot) {
-		return res.status(403).json({
-			message: 'Sorry, this spot is already booked for the specified dates',
-			statusCode: 403,
-			errors: {
-				startDate: 'Start date conflicts with an existing booking',
-				endDate: 'End date conflicts with an existing booking',
-			},
-		});
-	}
+	// console.log("spot booking",spotBooking)
+
+	let newEnd = new Date(endDate);
+	let newStart = new Date(startDate);
+	// let bookingArray = [];
+
+
+		if (spot && spotBooking){
+			return res.status(403).json({
+				message: 'Sorry, this spot is already booked for the specified dates',
+				statusCode: 403,
+				errors: {
+					startDate: 'Start date conflicts with an existing booking',
+					endDate: 'End date conflicts with an existing booking',
+				},
+			});
+		}
+
+	// ((booking.startDate<=newStart && booking.endDate<=newEnd)||(booking.startDate<=newStart)||(booking.endDate>=newEnd))
+	// else {
+	const newBooking = await Booking.create({
+		spotId: spot.id,
+		userId: req.user.id,
+		startDate,
+		endDate,
+	});
+	return res.status(200).json(newBooking);
+	// }
 
 	// try {
 	// if (req.user.id === spot.ownerId) {
-		const newBooking = await Booking.create({
-			spotId: spot.id,
-			userId: req.user.id,
-			startDate,
-			endDate,
-		});
-		return res.status(200).json(newBooking);
 	// } else {
 	// 	return res.status(403).json({
 	// 		message: 'Forbidden',
@@ -165,22 +171,22 @@ router.post('/:spotId/images', requireAuth, async (req, res, next) => {
 			});
 		}
 		// try {
-			if (spot.ownerId === req.user.id) {
-				let spotImage = await SpotImage.create({
-					spotId: spot.id,
-					url,
-					preview:true,
-				});
+		if (spot.ownerId === req.user.id) {
+			let spotImage = await SpotImage.create({
+				spotId: spot.id,
+				url,
+				preview: true,
+			});
 
-				let image = spotImage.toJSON();
-				delete image.spotId;
-				// delete image.preview;
-				delete image.createdAt;
-				delete image.updatedAt;
+			let image = spotImage.toJSON();
+			delete image.spotId;
+			// delete image.preview;
+			delete image.createdAt;
+			delete image.updatedAt;
 
-				return res.status(200).json(image);
-			} else {
-		// } catch {
+			return res.status(200).json(image);
+		} else {
+			// } catch {
 			return res.status(403).json({
 				message: 'Forbidden',
 				statusCode: 403,
@@ -371,7 +377,7 @@ router.get('/current', requireAuth, async (req, res) => {
 		spot = spot.toJSON();
 		const rating = await Review.findAll({
 			where: {
-				spotId:spot.id
+				spotId: spot.id,
 			},
 			attributes: [[sequelize.fn('AVG', sequelize.col('stars')), 'avgRating']],
 		});
