@@ -1,18 +1,19 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { thunkLoadSpots } from '../../store/allSpots';
-import { NavLink, useParams } from 'react-router-dom';
+import { NavLink, Redirect, useParams } from 'react-router-dom';
 import './AllSpots.css';
 function AllSpots() {
 	//  returning spot image, spot name?, price, rating, city/state(location), dates?
 	const spotsSelector = useSelector((state) => Object.values(state.spots.allSpots));
+
 	// const imageSelector = useSelector(state => Object.values(state.spots.allSpots.SpotImages))
 	// console.log('this is image selector',imageSelector)
 	// const {spotsSelector.id} = useParams()
 	// const spotId = spotsSelector.find()
 	// console.log('this is spotsSelector', spotsSelector);
 	// find id
-// const spotId = spotsSelector.find(spot => spot.id === +)
+	// const spotId = spotsSelector.find(spot => spot.id === +)
 	// const spotsArray = Object.values(spotsSelector);
 	const dispatch = useDispatch();
 	useEffect(() => {

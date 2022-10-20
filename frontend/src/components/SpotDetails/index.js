@@ -13,6 +13,7 @@ function SingleSpot() {
 	const history = useHistory()
 	const dispatch = useDispatch();
 	const spot = useSelector((state) => state.spots.singleSpot);
+	const userId = useSelector((state) => state.session.user);
 	console.log('this is spot use selector in SINGLE SPOT', spot)
 	const userSelector = useSelector((state) => state.session.user);
   // const [showModal, setShowModal] = useState(false);
@@ -37,6 +38,11 @@ function SingleSpot() {
 		);
 		spotDeleteButton = (
 		<button onClick={handleCancel}>Delete a spot</button>
+		)
+	}
+	if(!userId){
+		return(
+			<Redirect to='/' />
 		)
 	}
 	// if(userSelector && spot.length < 1) {
